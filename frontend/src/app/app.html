@@ -1,0 +1,160 @@
+<div class="layout">
+  <header class="header">
+    <div class="brand">
+      <h1>{{ title() }}</h1>
+      <span class="subtitle">ASP.NET Core 4-Layer Architecture + Angular Starter</span>
+    </div>
+    <div class="status-badge" [class.online]="health()">
+      <span class="dot"></span>
+      {{ health() ? 'API Connected (' + health()!.status + ')' : 'API Offline' }}
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card architecture-card">
+      <h2>Backend Layered Architecture</h2>
+      <div class="layers-grid">
+        <div class="layer-item">
+          <span class="layer-step">1</span>
+          <div>
+            <strong>ReDevice.Presentation</strong>
+            <p>Controllers, OpenAPI, CORS &amp; DI Host</p>
+          </div>
+        </div>
+        <div class="layer-item">
+          <span class="layer-step">2</span>
+          <div>
+            <strong>ReDevice.Business</strong>
+            <p>Business Services, DTOs &amp; Validation Rules</p>
+          </div>
+        </div>
+        <div class="layer-item">
+          <span class="layer-step">3</span>
+          <div>
+            <strong>ReDevice.Persistence</strong>
+            <p>Repositories &amp; Unit of Work Pattern</p>
+          </div>
+        </div>
+        <div class="layer-item">
+          <span class="layer-step">4</span>
+          <div>
+            <strong>ReDevice.Database</strong>
+            <p>Entities, EF Core Configurations &amp; PostgreSQL DbContext</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="content-grid">
+      <section class="card">
+        <h2>Register Device</h2>
+        <form (ngSubmit)="createDevice()" class="device-form">
+          <label>
+            <span>Device Name</span>
+            <input
+              type="text"
+              name="name"
+              [(ngModel)]="newDevice.name"
+              placeholder="e.g. iPhone 15 Pro 256GB"
+              required
+            />
+          </label>
+
+          <label>
+            <span>Serial Number</span>
+            <input
+              type="text"
+              name="serialNumber"
+              [(ngModel)]="newDevice.serialNumber"
+              placeholder="e.g. SN-90482-RD"
+              required
+            />
+          </label>
+
+          <div class="row">
+            <label>
+              <span>Category</span>
+              <select name="category" [(ngModel)]="newDevice.category">
+                <option value="Smartphone">Smartphone</option>
+                <option value="Laptop">Laptop</option>
+                <option value="Tablet">Tablet</option>
+                <option value="Accessory">Accessory</option>
+              </select>
+            </label>
+
+            <label>
+              <span>Price ($)</span>
+              <input
+                type="number"
+                name="price"
+                [(ngModel)]="newDevice.price"
+                min="0"
+                step="0.01"
+              />
+            </label>
+          </div>
+
+          <label>
+            <span>Condition</span>
+            <select name="condition" [(ngModel)]="newDevice.condition">
+              <option value="Refurbished - Grade A">Refurbished - Grade A</option>
+              <option value="Refurbished - Grade B">Refurbished - Grade B</option>
+              <option value="Used - Good">Used - Good</option>
+              <option value="For Parts / Repair">For Parts / Repair</option>
+            </select>
+          </label>
+
+          <button type="submit" class="btn-primary">Add Device</button>
+        </form>
+      </section>
+
+      <section class="card">
+        <div class="section-header">
+          <h2>Devices Inventory</h2>
+          <button type="button" class="btn-secondary" (click)="loadDevices()">Refresh</button>
+        </div>
+
+        @if (errorMessage()) {
+          <div class="alert">{{ errorMessage() }}</div>
+        }
+
+        @if (loading()) {
+          <p class="muted">Loading devices...</p>
+        } @else if (devices().length === 0) {
+          <p class="muted">No devices registered yet.</p>
+        } @else {
+          <table class="device-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Serial #</th>
+                <th>Category</th>
+                <th>Condition</th>
+                <th>Price</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (device of devices(); track device.id) {
+                <tr>
+                  <td><strong>{{ device.name }}</strong></td>
+                  <td><code>{{ device.serialNumber }}</code></td>
+                  <td>{{ device.category }}</td>
+                  <td>{{ device.condition }}</td>
+                  <td>{{ device.price | currency }}</td>
+                  <td class="actions">
+                    <button type="button" class="btn-danger" (click)="deleteDevice(device.id)">
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </section>
+    </div>
+  </main>
+
+  <router-outlet />
+</div>
